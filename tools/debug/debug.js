@@ -94,18 +94,29 @@ define(
     }
 
     function saveLogFilter() {
-      if (window.localStorage) {
-        localStorage.setItem('logFilter_eventNames', logFilter.eventNames);
-        localStorage.setItem('logFilter_actions', logFilter.actions);
-      }
+      try {
+        if (window.localStorage) {
+          localStorage.setItem('logFilter_eventNames', logFilter.eventNames);
+          localStorage.setItem('logFilter_actions', logFilter.actions);
+        }
+      } catch (ignored) {};
     }
 
     function retrieveLogFilter() {
+      var eventNames, actions;
+      try {
+        eventNames = (window.localStorage && localStorage.getItem('logFilter_eventNames'));
+        actions = (window.localStorage && localStorage.getItem('logFilter_actions'));
+      } catch(ignored) {
+        eventNames = defaultEventNamesFilter;
+        actions = defaultActionsFilter;
+      }
       var result = {
-        eventNames: (window.localStorage && localStorage.getItem('logFilter_eventNames')) || defaultEventNamesFilter,
-        actions: (window.localStorage && localStorage.getItem('logFilter_actions')) || defaultActionsFilter
+        eventNames: eventNames,
+        actions: actions
       };
-      //reconstitute arrays
+
+      // reconstitute arrays
       Object.keys(result).forEach(function(k) {
         var thisProp = result[k];
         if (typeof thisProp == 'string' && thisProp !== ALL) {
